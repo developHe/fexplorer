@@ -18,7 +18,7 @@
     </style>
     
     <style name="TextViewNormal">
-        <item name="textColor">@color/defaultText</item>
+        <item name="android:textColor">@color/defaultText</item>
     </style>
 
 </resources>
