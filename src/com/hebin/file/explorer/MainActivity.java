@@ -3,6 +3,7 @@ package com.hebin.file.explorer;
 import java.io.File;
 
 import com.hebin.file.util.FileStackUtil;
+import com.hebin.file.util.MimeUtil;
 import com.hebin.file.util.SortUtil;
 
 import android.app.Activity;
@@ -35,7 +36,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		MimeUtil.initMime();
+		
 		initViews();
 		if(savedInstanceState == null){
 			mFileStack = new FileStackUtil();
