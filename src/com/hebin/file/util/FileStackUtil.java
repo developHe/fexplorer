@@ -13,6 +13,7 @@ public class FileStackUtil {
 	private List<File> mPath;
 	public FileStackUtil(){
 		mPath = new ArrayList<File>();
+		mPath.add(new File(File.separator));
 	}
 	
 	public File pop(){
@@ -57,9 +58,12 @@ public class FileStackUtil {
 	public String combinePath(){
 		if(mPath.size() == 0)
 			return null;
+		if(mPath.size() == 1)
+			return File.separator;
 		String path = "";
-		for(int i=0; i<mPath.size(); i++)
-			path += "/" + mPath.get(i).getName();
+		for(int i=0; i<mPath.size()-1; i++)
+			path += mPath.get(i).getName() + File.separator;
+		path += mPath.get(mPath.size() - 1).getName();
 		return path;
 	}
 }

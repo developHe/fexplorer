@@ -17,13 +17,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.os.Build;
 
-public class MainActivity extends Activity implements OnClickListener{
+public class MainActivity extends Activity implements OnClickListener, OnItemClickListener{
 	private AutoCompleteTextView mUriText;
 	private Button 		         mBtnBack;
 	private FileStackUtil        mFileStack;
@@ -48,6 +50,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		mBtnBack.setOnClickListener(this);
 		
 		mFileListView = (ListView) findViewById(R.id.main_list_files);
+		mFileListView.setOnItemClickListener(this);
 	}
 	
 	/**
@@ -57,13 +60,14 @@ public class MainActivity extends Activity implements OnClickListener{
 		String sdPath = Environment.getExternalStorageDirectory().getPath();
 		mFileStack.pushFullPath(new File(sdPath));
 		mUriText.setText(sdPath);
-		
-		String[] files = new File(sdPath).list();
-		if(files == null)
-			return;
-		mSortTool.sortStringArray(files);
-		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
-		mFileListView.setAdapter(adap);
+		File ff = new File(sdPath);
+		updateFileViews(ff);
+//		String[] files = ff.list(new FilenameFilter());
+//		if(files == null)
+//			return;
+//		mSortTool.sortStringArray(files);
+//		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
+//		mFileListView.setAdapter(adap);
 	}
 
 	@Override
@@ -89,8 +93,57 @@ public class MainActivity extends Activity implements OnClickListener{
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			
+			File file = mFileStack.getTop();
+			String name = file.getAbsolutePath();
+			if(name.equals(File.separator))
+				return super.onKeyUp(keyCode, event);
+			mFileStack.pop();
+			file = mFileStack.getTop();
+			mUriText.setText(file.getAbsolutePath());
+			updateFileViews(file);
+			return true;
+		}
 		return super.onKeyUp(keyCode, event);
 	}
 
+	private void updateFileViews(File f){
+		String[] files = f.list(new FilenameFilter());
+		if(files == null)
+			files = new String[0];
+		mSortTool.sortStringArray(files);
+		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
+		mFileListView.setAdapter(adap);
+		mUriText.setText(f.getAbsolutePath());
+	}
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		// TODO Auto-generated method stub
+		String fname = (String) mFileListView.getAdapter().getItem(arg2);
+		String path  = mUriText.getText().toString();
+		File file = new File(path+"/"+fname);
+		if(file.isDirectory()){
+			updateFileViews(file);
+//			mUriText.setText(path+"/"+fname);
+//			String[] files = file.list();
+//			if(files == null)
+//				files = new String[1];
+//			mSortTool.sortStringArray(files);
+//			ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
+//			mFileListView.setAdapter(adap);
+			mFileStack.push(file);
+		}
+	}
+
+	class FilenameFilter implements java.io.FilenameFilter{
+
+		@Override
+		public boolean accept(File arg0, String arg1) {
+			// TODO Auto-generated method stub
+			return true;
+		}
+		
+	}
 
 }
