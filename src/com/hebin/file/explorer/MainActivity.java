@@ -1,6 +1,8 @@
 package com.hebin.file.explorer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.hebin.file.util.FileStackUtil;
 import com.hebin.file.util.MimeUtil;
@@ -37,7 +39,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		MimeUtil.initMime();
-		
+
 		initViews();
 		if(savedInstanceState == null){
 			mFileStack = new FileStackUtil();
@@ -64,12 +66,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		mUriText.setText(sdPath);
 		File ff = new File(sdPath);
 		updateFileViews(ff);
-//		String[] files = ff.list(new FilenameFilter());
-//		if(files == null)
-//			return;
-//		mSortTool.sortStringArray(files);
-//		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
-//		mFileListView.setAdapter(adap);
 	}
 
 	@Override
@@ -96,7 +92,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if(keyCode == KeyEvent.KEYCODE_BACK){
-			
 			File file = mFileStack.getTop();
 			String name = file.getAbsolutePath();
 			if(name.equals(File.separator))
@@ -115,25 +110,23 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		if(files == null)
 			files = new String[0];
 		mSortTool.sortStringArray(files);
-		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
-		mFileListView.setAdapter(adap);
+		FileAdapter fileAdap = new FileAdapter(this);
+		List<File> listF = new ArrayList<File>();
+		for(int i=0; i<files.length; i++)
+			listF.add(new File(f.getAbsolutePath() + "/" + files[i]));
+		fileAdap.fillData(listF);
+//		ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
+		mFileListView.setAdapter(fileAdap);
 		mUriText.setText(f.getAbsolutePath());
 	}
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
-		String fname = (String) mFileListView.getAdapter().getItem(arg2);
+		String fname = ((File) mFileListView.getAdapter().getItem(arg2)).getName();
 		String path  = mUriText.getText().toString();
 		File file = new File(path+"/"+fname);
 		if(file.isDirectory()){
 			updateFileViews(file);
-//			mUriText.setText(path+"/"+fname);
-//			String[] files = file.list();
-//			if(files == null)
-//				files = new String[1];
-//			mSortTool.sortStringArray(files);
-//			ArrayAdapter<String> adap = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, files);
-//			mFileListView.setAdapter(adap);
 			mFileStack.push(file);
 		}
 	}

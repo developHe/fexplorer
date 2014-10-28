@@ -130,6 +130,8 @@ public class MimeUtil {
 		if(extName==null)
 			return -1;
 		String[] type = mMimeHash.get(extName.toLowerCase());
+		if(type == null)
+			return R.drawable.icon_file_other_xml;
 		for(int i=0; i<mResTable.length; i++){
 			if( mResTable[i].mtype.equals(type[1]) )
 				return mResTable[i].mresId;
